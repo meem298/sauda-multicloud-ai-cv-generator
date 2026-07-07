@@ -1,0 +1,16 @@
+# ── Required ──────────────────────────────────────────────────────────────────
+gcp_project_id = "<YOUR_GCP_PROJECT_ID>"
+domain         = "<YOUR_DOMAIN>"                    # e.g. sauda.io
+
+# ACM cert (must be in us-east-1, for CloudFront)
+acm_certificate_arn = "<ACM_CERTIFICATE_ARN>"
+
+# Ops alerts email
+alert_email = "<YOUR_OPS_EMAIL>"
+
+# SNS topics for CloudWatch alarms (optional)
+sns_alarm_arns = []
+
+# ── Defaults ──────────────────────────────────────────────────────────────────
+aws_region = "us-east-1"
+gcp_region = "us-central1"

@@ -1,0 +1,20 @@
+# ── Required — fill these in before running terraform apply ──────────────────
+
+# GCP Project ID (create a project in GCP Console first)
+gcp_project_id = "<YOUR_GCP_PROJECT_ID>"
+
+# Docker image tag to deploy (build and push your image to ECR first)
+image_tag = "latest"
+
+# Email for monitoring alerts
+alert_email = "<YOUR_EMAIL>"
+
+# ── Optional — leave empty to use auto-generated CloudFront / Cloud Run URLs ──
+domain = ""
+
+# Only needed if domain is set
+acm_certificate_arn = "<ACM_CERTIFICATE_ARN>"
+
+# ── Defaults (change only if needed) ─────────────────────────────────────────
+aws_region  = "us-east-1"
+gcp_region  = "us-central1"

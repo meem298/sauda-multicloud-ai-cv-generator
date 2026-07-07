@@ -1,0 +1,95 @@
+name: Terraform Lint & Format Check
+
+on:
+  pull_request:
+    paths:
+      - "infra/**"
+      - "docker/**"
+      - ".github/workflows/terraform-lint.yml"
+
+jobs:
+  fmt-check:
+    name: terraform fmt check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.6"
+
+      - name: Check formatting — AWS modules
+        run: terraform fmt -check -recursive infra/modules/aws/
+
+      - name: Check formatting — GCP modules
+        run: terraform fmt -check -recursive infra/modules/gcp/
+
+      - name: Check formatting — environments
+        run: terraform fmt -check -recursive infra/environments/
+
+      - name: Check formatting — global
+        run: terraform fmt -check -recursive infra/global/
+
+  tflint-aws:
+    name: tflint — AWS
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+
+      - name: Init tflint (AWS)
+        run: |
+          cat > .tflint.hcl <<'EOF'
+          plugin "aws" {
+            enabled = true
+            version = "0.32.0"
+            source  = "github.com/terraform-linters/tflint-ruleset-aws"
+          }
+          EOF
+          tflint --init
+
+      - name: Run tflint — AWS modules
+        run: tflint --recursive --chdir infra/modules/aws/
+
+  tflint-gcp:
+    name: tflint — GCP
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+
+      - name: Init tflint (GCP)
+        run: |
+          cat > .tflint.hcl <<'EOF'
+          plugin "google" {
+            enabled = true
+            version = "0.27.1"
+            source  = "github.com/terraform-linters/tflint-ruleset-google"
+          }
+          EOF
+          tflint --init
+
+      - name: Run tflint — GCP modules
+        run: tflint --recursive --chdir infra/modules/gcp/
+
+  dockerfile-lint:
+    name: Dockerfile lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint backend Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: docker/backend/Dockerfile
+
+      - name: Lint frontend Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: docker/frontend/Dockerfile
